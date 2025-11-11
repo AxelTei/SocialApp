@@ -4,11 +4,10 @@ import { Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { FeedScreen } from '../screens/FeedScreen';
+import { ProfileScreen } from '../screens/ProfileScreen';
+import { SettingsScreen } from '../screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
-
-const ProfileScreen = () => null;
-const SettingsScreen = () => null;
 
 export const AppNavigator: React.FC = () => {
   return (
