@@ -15,7 +15,7 @@ function feedReducer(state: FeedState, action: FeedAction): FeedState {
     case 'LOAD_POSTS':
       return {
         ...state,
-        posts: [...state.posts, ...action.payload],
+        posts: action.payload,  // Remplace au lieu de concat
         loading: false,
         refreshing: false,
       };
@@ -80,12 +80,12 @@ export function useFeed() {
   };
 
   const refreshPosts = () => {
-    dispatch({ type: 'SET_REFRESHING', payload: true });
-    // Simuler un délai réseau
-    setTimeout(() => {
-      dispatch({ type: 'LOAD_POSTS', payload: mockPosts.slice(0, 10) });
-    }, 1500);
-  };
+  dispatch({ type: 'SET_REFRESHING', payload: true });
+  setTimeout(() => {
+    // Utilise un nouveau type d'action pour refresh
+    dispatch({ type: 'LOAD_POSTS', payload: mockPosts.slice(0, 10) });
+  }, 1500);
+};
 
   const loadMorePosts = () => {
     if (state.loading || !state.hasMore) return;

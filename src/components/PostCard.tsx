@@ -1,6 +1,6 @@
 // src/components/PostCard.tsx
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, Animated } from 'react-native';
 import { Post } from '../types/social.types';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -18,6 +18,72 @@ export const PostCard: React.FC<PostCardProps> = ({
   onComment,
   onProfile,
 }) => {
+  const likeScale = useRef(new Animated.Value(1)).current;
+  const heartScale = useRef(new Animated.Value(0)).current;
+  const heartOpacity = useRef(new Animated.Value(0)).current;
+  const lastTap = useRef(0);
+
+  const handleLike = () => {
+    onLike(post.id);
+    
+    Animated.sequence([
+      Animated.spring(likeScale, {
+        toValue: 1.3,
+        useNativeDriver: true,
+      }),
+      Animated.spring(likeScale, {
+        toValue: 1,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTap.current < DOUBLE_TAP_DELAY) {
+      if (!post.isLiked) {
+        onLike(post.id);
+      }
+
+      heartScale.setValue(0);
+      heartOpacity.setValue(1);
+
+      Animated.parallel([
+        Animated.sequence([
+          Animated.spring(heartScale, {
+            toValue: 1,
+            useNativeDriver: true,
+          }),
+          Animated.spring(heartScale, {
+            toValue: 1.2,
+            useNativeDriver: true,
+          }),
+          Animated.timing(heartScale, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.timing(heartOpacity, {
+            toValue: 1,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(heartOpacity, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start();
+    }
+
+    lastTap.current = now;
+  };
+
   const formatDate = (date: Date) => {
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
@@ -31,7 +97,6 @@ export const PostCard: React.FC<PostCardProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.userInfo}
@@ -46,16 +111,37 @@ export const PostCard: React.FC<PostCardProps> = ({
         <Text style={styles.date}>{formatDate(post.createdAt)}</Text>
       </View>
 
-      {/* Image */}
-      <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
+      <TouchableOpacity activeOpacity={1} onPress={handleDoubleTap}>
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
+          
+          <Animated.View 
+            style={[
+              styles.bigHeart,
+              {
+                transform: [{ scale: heartScale }],
+                opacity: heartOpacity,
+              }
+            ]}
+          >
+            <Text style={styles.bigHeartIcon}>❤️</Text>
+          </Animated.View>
+        </View>
+      </TouchableOpacity>
 
-      {/* Actions */}
       <View style={styles.actions}>
         <TouchableOpacity 
           style={styles.actionButton}
-          onPress={() => onLike(post.id)}
+          onPress={handleLike}
         >
-          <Text style={styles.actionIcon}>{post.isLiked ? '❤️' : '🤍'}</Text>
+          <Animated.Text 
+            style={[
+              styles.actionIcon,
+              { transform: [{ scale: likeScale }] }
+            ]}
+          >
+            {post.isLiked ? '❤️' : '🤍'}
+          </Animated.Text>
           <Text style={styles.actionText}>{post.likesCount}</Text>
         </TouchableOpacity>
 
@@ -72,7 +158,6 @@ export const PostCard: React.FC<PostCardProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* Caption */}
       {post.caption && (
         <View style={styles.captionContainer}>
           <Text style={styles.caption}>
@@ -119,10 +204,28 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9CA3AF',
   },
+  imageContainer: {
+    position: 'relative',
+  },
   postImage: {
     width: SCREEN_WIDTH,
     height: SCREEN_WIDTH,
     backgroundColor: '#F3F4F6',
+  },
+  bigHeart: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginLeft: -60,
+    marginTop: -60,
+    width: 120,
+    height: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    pointerEvents: 'none',
+  },
+  bigHeartIcon: {
+    fontSize: 120,
   },
   actions: {
     flexDirection: 'row',
