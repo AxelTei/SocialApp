@@ -1,5 +1,5 @@
 // src/screens/FeedScreen.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   FlatList,
@@ -12,13 +12,17 @@ import {
 import { PostCard } from '../components/PostCard';
 import { useFeed } from '../hooks/useFeed';
 import { Post } from '../types/social.types';
+import { Modal } from 'react-native';
+import { CommentsScreen } from './CommentsScreen';
 
 export const FeedScreen: React.FC = () => {
   const { posts, loading, refreshing, hasMore, refreshPosts, loadMorePosts, toggleLike } = useFeed();
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [commentsVisible, setCommentsVisible] = useState(false);
 
   const handleComment = (post: Post) => {
-    console.log('Open comments for post:', post.id);
-    // On implémentera ça plus tard
+    setSelectedPost(post);
+    setCommentsVisible(true);
   };
 
   const handleProfile = (userId: string) => {
@@ -76,6 +80,18 @@ export const FeedScreen: React.FC = () => {
         ListEmptyComponent={renderEmpty}
         showsVerticalScrollIndicator={false}
       />
+      <Modal
+        visible={commentsVisible}
+        animationType='slide'
+        onRequestClose={() => setCommentsVisible(false)}
+      >
+        {selectedPost && (
+          <CommentsScreen
+            post={selectedPost}
+            onClose={() => setCommentsVisible(false)}
+          />
+        )}
+      </Modal>
     </SafeAreaView>
   );
 };
