@@ -6,6 +6,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { FeedScreen } from '../screens/FeedScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { CreatePostScreen } from '../screens/CreatePostScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -41,6 +42,14 @@ export const AppNavigator: React.FC = () => {
           options={{
             tabBarLabel: 'Réglages',
             tabBarIcon: ({ color }) => <Text style={{ fontSize: 24 }}>⚙️</Text>,
+          }}
+        />
+        <Tab.Screen
+          name="Create"
+          component={CreatePostScreen}
+          options={{
+            tabBarLabel: 'Créer',
+            tabBarIcon: ({ color }) => <Text style={{ fontSize: 24 }}>➕</Text>,
           }}
         />
       </Tab.Navigator>
