@@ -76,7 +76,7 @@ export function useFeed() {
     // Simuler un délai réseau
     setTimeout(() => {
       dispatch({ type: 'LOAD_POSTS', payload: mockPosts.slice(0, 10) });
-    }, 1000);
+    }, 3000);
   };
 
   const refreshPosts = () => {
@@ -84,7 +84,7 @@ export function useFeed() {
   setTimeout(() => {
     // Utilise un nouveau type d'action pour refresh
     dispatch({ type: 'LOAD_POSTS', payload: mockPosts.slice(0, 10) });
-  }, 1500);
+  }, 3000);
 };
 
   const loadMorePosts = () => {

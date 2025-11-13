@@ -14,6 +14,7 @@ import { useFeed } from '../hooks/useFeed';
 import { Post } from '../types/social.types';
 import { Modal } from 'react-native';
 import { CommentsScreen } from './CommentsScreen';
+import { SkeletonPost } from '../components/SkeletonPost';
 
 export const FeedScreen: React.FC = () => {
   const { posts, loading, refreshing, hasMore, refreshPosts, loadMorePosts, toggleLike } = useFeed();
@@ -42,8 +43,10 @@ export const FeedScreen: React.FC = () => {
   const renderEmpty = () => {
     if (loading) {
       return (
-        <View style={styles.emptyContainer}>
-          <ActivityIndicator size="large" color="#3B82F6" />
+        <View>
+          <SkeletonPost />
+          <SkeletonPost />
+          <SkeletonPost />
         </View>
       );
     }
